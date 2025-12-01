@@ -1,4 +1,4 @@
-# AnyVM Docker
+# AnyVM Docker [![Build and Publish Docker Image](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml/badge.svg)](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml)
 
 Run AnyVM images inside Docker to spin up throwaway VMs for different OS targets.
 
