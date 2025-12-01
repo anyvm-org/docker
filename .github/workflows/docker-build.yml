@@ -37,6 +37,7 @@ jobs:
           tags: |
             type=ref,event=branch   # branch name on push
             type=ref,event=tag      # release tag on published release
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }} # latest on main
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -54,4 +55,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
