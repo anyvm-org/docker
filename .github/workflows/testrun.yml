@@ -52,7 +52,7 @@ jobs:
         mkdir -p ${mountdir}
         echo "anyvm" > ${mountdir}/justcheck.txt
         sudo chmod o+rw /dev/kvm
-        docker run --rm -it --device /dev/kvm:/dev/kvm:rw \
+        docker run --device /dev/kvm:/dev/kvm:rw \
         -v "$(pwd)/${mountdir}:/mnt/host" \
         testimage --debug --os "${{ inputs.os }}" \
         --release "${{ inputs.release }}" \
