@@ -1,0 +1,73 @@
+name: TestRun
+
+on:
+  workflow_call:
+    inputs:
+      runs:
+        description: "Runs on"
+        required: false
+        type: string
+      os:
+        description: "Test os"
+        required: true
+        type: string
+      arch:
+        description: "Test arch"
+        required: true
+        type: string
+      release:
+        description: "Test release"
+        required: false
+        type: string
+      nic:
+        description: "VM nic type"
+        required: false
+        type: string
+      sync:
+        description: "Sync type"
+        required: false
+        type: string
+
+
+
+jobs:
+  test:
+    runs-on: ${{ inputs.runs }}
+    name: Test ${{ inputs.release }} ${{ inputs.arch }} ${{ inputs.sync }}
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build image
+      run: |
+        set -e
+        docker build -t testimage .
+
+    - name: Test 
+      id: test
+      shell: bash
+      run: |
+        set -e
+        mountdir=test
+        mkdir -p ${mountdir}
+        echo "anyvm" > ${mountdir}/justcheck.txt
+        sudo chmod o+rw /dev/kvm
+        docker run --rm -it --device /dev/kvm:/dev/kvm:rw \
+        -v "$(pwd)/${mountdir}:/mnt/host" \
+        testimage --debug --os "${{ inputs.os }}" \
+        --release "${{ inputs.release }}" \
+        --arch "${{ inputs.arch }}" \
+        --nc "${{ inputs.nc }}" \
+        --sync "${{ inputs.sync }}" \
+        -- "ls /mnt/host | grep justcheck.txt"
+
+    
+
+
+
+
+
+
+
+
+

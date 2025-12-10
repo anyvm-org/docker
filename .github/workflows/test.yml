@@ -1,0 +1,74 @@
+
+name: Test
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'Dockerfile'
+      - 'entrypoint.sh'
+      - '.github/workflows/test.yml'
+      - '.github/workflows/testrun.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testsync:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["freebsd", "netbsd", "openbsd"]
+        arch: ["aarch64", ""]
+        runs: ["ubuntu-24.04"]
+        sync: ["sshfs", "scp", "rsync"]
+
+    uses: ./.github/workflows/testrun.yml
+    secrets: inherit
+    with:
+      runs: ${{ matrix.runs }}
+      os: ${{ matrix.os }}
+      arch: ${{ matrix.arch }}
+      sync: ${{ matrix.sync }}
+
+
+  testnfs:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["freebsd", "netbsd", "openbsd", "solaris", "dragonflybsd", "omnios", "openindiana"]
+        arch: ["aarch64", ""]
+        runs: ["ubuntu-24.04"]
+        exclude:
+          - os: solaris
+            arch: aarch64
+          - os: dragonflybsd
+            arch: aarch64
+          - os: omnios
+            arch: aarch64
+          - os: openindiana
+            arch: aarch64
+
+    uses: ./.github/workflows/testrun.yml
+    secrets: inherit
+    with:
+      runs: ${{ matrix.runs }}
+      os: ${{ matrix.os }}
+      arch: ${{ matrix.arch }}
+      sync: nfs
+   
+
+
+
+
+
+
+
+      
+      
+      
