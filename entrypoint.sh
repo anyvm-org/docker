@@ -19,7 +19,7 @@ detect_host_mounts() {
         esac
 
         case "$mount_point" in
-            /|/proc|/sys|/dev|/dev/*|/run|/run/*|${DATA_DIR}|${DATA_DIR}/*)
+            /|/proc|/sys|/dev|/dev/*|/run|/run/*|/usr/|/usr/*|${DATA_DIR}|${DATA_DIR}/*)
                 continue
                 ;;
         esac
