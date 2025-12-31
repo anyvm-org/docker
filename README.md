@@ -61,7 +61,31 @@ docker run --rm -it \
 ```
 
 
-## 7. More info
+## 7. Exposed Ports
+The following ports are exposed by the container for various services:
+
+| Port | Description |
+|---|---|
+| `10022` | Default SSH port for the VM |
+| `5900` | Default VNC port for the VM |
+| `6080` | Default Web VNC port (noVNC) |
+| `7000` | QEMU Monitor port |
+
+To access these from your host, publish them with `-p`. For example:
+```sh
+docker run --rm -it -p 10022:10022 -p 6080:6080 ghcr.io/anyvm-org/anyvm --os freebsd
+```
+
+## 8. Persistent Storage
+The container uses `/data` to store downloaded VM images and configuration. To avoid re-downloading images every time you run the container, mount a host directory to `/data`:
+
+```sh
+docker run --rm -it \
+  -v $(pwd)/anyvm-data:/data \
+  ghcr.io/anyvm-org/anyvm --os freebsd
+```
+
+## 9. More info
 See the [anyvm](https://github.com/anyvm-org/anyvm) project for available OS targets and options.
 
 
