@@ -1,92 +1,101 @@
-# AnyVM Docker [![Build and Publish Docker Image](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml/badge.svg)](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml)
+<div align="center">
+  <img src="https://raw.githubusercontent.com/anyvm-org/anyvm/main/logo.png" alt="AnyVM Logo" width="120">
+  <h1>AnyVM Docker</h1>
+  <p><strong>Spin up disposable VMs for any OS target, instantly inside Docker.</strong></p>
 
-Run AnyVM images inside Docker to spin up throwaway VMs for different OS targets.
+  [![Build and Publish Docker Image](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml/badge.svg)](https://github.com/anyvm-org/docker/actions/workflows/docker-build.yml)
+  [![License](https://img.shields.io/github/license/anyvm-org/docker)](https://github.com/anyvm-org/docker/blob/main/LICENSE)
+</div>
 
-## 1. Quick start
-```sh
+<hr />
+
+AnyVM Docker allows you to run full operating systems (FreeBSD, OpenBSD, NetBSD, Haiku, etc.) inside a Docker container using QEMU. It's perfect for testing, CI/CD, and "throwaway" development environments.
+
+## 🚀 Quick Start
+
+Run a FreeBSD VM instantly:
+```bash
 docker run --rm -it ghcr.io/anyvm-org/anyvm --os freebsd
 ```
-Replace `--os freebsd` with the OS you want to boot.
+> [!TIP]
+> Replace `--os freebsd` with your desired OS (e.g., `openbsd`, `netbsd`, `haiku`, `ubuntu`).
 
-## 2. Mount a host folder into the VM
-```sh
-mkdir -p test
+---
+
+## ✨ Features
+
+- **Multi-Arch & Multi-OS**: Supports x86_64, ARM64, and RISC-V targets.
+- **Persistent Storage**: Cache downloaded images to avoid re-downloads.
+- **Automatic Port Discovery**: Automatically detects and mounts host folders.
+- **KVM Support**: Hardware acceleration if the host supports it.
+- **VNC & Web Access**: Built-in VNC and noVNC (Web) access.
+- **Integrated SSH**: Automatic SSH daemon for easy VM interaction.
+
+---
+
+## 🛠️ Common Scenarios
+
+### 📁 1. Mount Host Folder into VM
+Share files between your host and the guest VM.
+```bash
+mkdir -p workspace
 docker run --rm -it \
-  -v $(pwd)/test:/mnt/host \
+  -v $(pwd)/workspace:/mnt/host \
   ghcr.io/anyvm-org/anyvm --os freebsd
 ```
 
-## 3. Expose VM ports to the host
-```sh
-docker run --rm -it \
-  -p 10022:10022 \
-  ghcr.io/anyvm-org/anyvm --os freebsd
-```
-Default VM SSH port is `10022`.
-
-## 4. Forward host traffic into the VM
-```sh
-docker run --rm -it \
-  -p 8080:8080 \
-  ghcr.io/anyvm-org/anyvm --os freebsd -p 8080:80
-```
-The first `-p` publishes container port 8080 to the host; the second forwards container 8080 to VM port 80.
-
-## 5. Send a command via SSH with `--`
-Use `--` to separate AnyVM arguments from a command you want executed via your SSH handler. Args after `--` are executed in the VM.
-```sh
-
-docker run --rm -it ghcr.io/anyvm-org/anyvm --os freebsd -- uname -a
-
-
-
-
-mkdir -p test
-echo "text in host" >test/host.txt
-
-docker run --rm -it \
-  -v $(pwd)/test:/mnt/host \
-  ghcr.io/anyvm-org/anyvm --os freebsd -- ls /mnt/host
-
-
-
-```
-
-## 6. Enable KVM acceleration
-Map the host KVM device into the container with read-write access to allow hardware acceleration.
-```sh
-docker run --rm -it \
-  --device /dev/kvm:/dev/kvm:rw \
-  ghcr.io/anyvm-org/anyvm --os freebsd
-```
-
-
-## 7. Exposed Ports
-The following ports are exposed by the container for various services:
-
-| Port | Description |
-|---|---|
-| `10022` | Default SSH port for the VM |
-| `5900` | Default VNC port for the VM |
-| `6080` | Default Web VNC port (noVNC) |
-| `7000` | QEMU Monitor port |
-
-To access these from your host, publish them with `-p`. For example:
-```sh
-docker run --rm -it -p 10022:10022 -p 6080:6080 ghcr.io/anyvm-org/anyvm --os freebsd
-```
-
-## 8. Persistent Storage
-The container uses `/data` to store downloaded VM images and configuration. To avoid re-downloading images every time you run the container, mount a host directory to `/data`:
-
-```sh
+### 💾 2. Persistent Image Storage
+Cache VM images in a host directory to save bandwidth and time.
+```bash
 docker run --rm -it \
   -v $(pwd)/anyvm-data:/data \
   ghcr.io/anyvm-org/anyvm --os freebsd
 ```
 
-## 9. More info
-See the [anyvm](https://github.com/anyvm-org/anyvm) project for available OS targets and options.
+### 🌐 3. Expose Ports & Forward Traffic
+Access VM services from your host machine.
+```bash
+docker run --rm -it \
+  -p 10022:10022 -p 8080:8080 \
+  ghcr.io/anyvm-org/anyvm --os freebsd -p 8080:80
+```
+*The first `-p` publishes container port 8080; the second `-p` (after image name) forwards container 8080 to VM port 80.*
 
+### ⚡ 4. Enable KVM Acceleration
+Significantly improve performance if your host supports KVM.
+```bash
+docker run --rm -it \
+  --device /dev/kvm:/dev/kvm:rw \
+  ghcr.io/anyvm-org/anyvm --os freebsd
+```
 
+---
 
+## 🔌 Exposed Ports
+
+The container exposes several ports by default for convenience:
+
+| Port | Service | Description |
+|:---:|:---|:---|
+| `10022` | **SSH** | Connect via `ssh -p 10022 root@localhost` |
+| `6080` | **Web VNC** | Access GUI via browser at `http://localhost:6080` |
+| `5900` | **VNC** | Access GUI via VNC client |
+| `7000` | **Monitor** | Access QEMU Monitor console |
+
+---
+
+## ⌨️ Advanced: Direct Commands
+Use `--` to execute a command inside the VM directly via SSH after boot.
+```bash
+docker run --rm -it ghcr.io/anyvm-org/anyvm --os freebsd -- uname -a
+```
+
+---
+
+## 📖 More Information
+For a full list of supported operating systems and advanced options, please visit the [AnyVM Main Repository](https://github.com/anyvm-org/anyvm).
+
+<div align="center">
+  <br />
+  <sub>Built with ❤️ by the AnyVM Team</sub>
+</div>
