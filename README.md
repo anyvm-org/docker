@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/anyvm-org/anyvm/main/logo.png" alt="AnyVM Logo" width="120">
   <h1>AnyVM Docker</h1>
   <p><strong>Spin up disposable VMs for any OS target, instantly inside Docker.</strong></p>
 
