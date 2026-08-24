@@ -41,10 +41,20 @@ jobs:
         with:
           images: |
             ${{ env.GHCR_IMAGE }}
+          # `tags` is a YAML block scalar, so a '#' here is CONTENT, not a
+          # YAML comment -- metadata-action parses it. Since v6 only a
+          # FULL-LINE '#' is treated as a comment; a trailing one is kept as
+          # part of the value ("List inputs now preserve # inside values
+          # while still supporting full-line # comments", v6.0.0 / PR 607),
+          # which made v6 reject "type=ref,event=branch   # branch name on
+          # push" as an invalid event. Keep every comment on its own line.
           tags: |
-            type=ref,event=branch   # branch name on push
-            type=ref,event=tag      # release tag on published release
-            type=raw,value=latest,enable=${{ github.event_name == 'release' }} # latest only on release
+            # branch name on push
+            type=ref,event=branch
+            # release tag on published release
+            type=ref,event=tag
+            # latest only on release
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
 
       - name: Login to GHCR
         uses: docker/login-action@v4
