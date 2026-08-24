@@ -18,16 +18,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Guest lists below cover every guest that can go through testrun.yml, and
+# each list is derived from the builders' own releases.json (arch set and
+# VM_SYNC_METHODS), not from guesswork.
+#
+# Four guests are absent because they have NO sshd at all -- plan9,
+# reactos, riscos and redox are driven over a telnet agent, and testrun.yml
+# ends in `-- "ls /mnt/host | ..."` over ssh. haiku is absent for a
+# different reason: it needs user=user and a vmpath on the real BFS volume,
+# and testrun.yml exposes neither input. Adding any of them means extending
+# testrun.yml first, not just widening a matrix.
 jobs:
+  # scp and rsync. Every guest here has rsync in its sync list except
+  # blissos, whose Android userspace supports scp only -- so it is excluded
+  # from the rsync half rather than left out of the job entirely.
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: ["freebsd", "midnightbsd", "netbsd", "openbsd", "solaris", "dragonflybsd", "omnios", "openindiana"]
+        os: ["freebsd", "hardenedbsd", "opnsense", "ghostbsd", "midnightbsd",
+             "nextbsd", "netbsd", "openbsd", "solaris", "dragonflybsd",
+             "omnios", "openindiana", "tribblix", "ubuntu", "debian",
+             "rocky", "almalinux", "openeuler", "alpine", "blissos", "hurd"]
         arch: ["aarch64", ""]
         runs: ["ubuntu-24.04"]
         sync: ["scp", "rsync"]
         exclude:
+          # x86_64-only images: no aarch64 build exists to test.
           - os: solaris
             arch: aarch64
           - os: dragonflybsd
@@ -38,6 +55,21 @@ jobs:
             arch: aarch64
           - os: openindiana
             arch: aarch64
+          - os: hardenedbsd
+            arch: aarch64
+          - os: opnsense
+            arch: aarch64
+          - os: ghostbsd
+            arch: aarch64
+          - os: tribblix
+            arch: aarch64
+          - os: blissos
+            arch: aarch64
+          - os: hurd
+            arch: aarch64
+          # BlissOS ships scp only (Android userspace has no rsync).
+          - os: blissos
+            sync: rsync
 
     uses: ./.github/workflows/testrun.yml
     secrets: inherit
@@ -49,23 +81,28 @@ jobs:
 
 
 
+  # sshfs, which needs the guest to ship an sshfs binary and a working
+  # /dev/fuse. The list is exactly the guests whose VM_SYNC_METHODS names
+  # sshfs -- notably NOT rocky/almalinux (fuse-sshfs is EPEL-only),
+  # opnsense (not in its package repo), nextbsd (kernel built NO_MODULES)
+  # or hurd (no FUSE at all).
   testsshfs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["freebsd", "midnightbsd", "netbsd", "openbsd", "openindiana"]
+        os: ["freebsd", "hardenedbsd", "ghostbsd", "midnightbsd", "netbsd",
+             "openbsd", "openindiana", "ubuntu", "debian", "openeuler",
+             "alpine"]
         arch: ["aarch64", ""]
         runs: ["ubuntu-24.04"]
         exclude:
-          - os: solaris
-            arch: aarch64
-          - os: dragonflybsd
-            arch: aarch64
           - os: midnightbsd
             arch: aarch64
-          - os: omnios
-            arch: aarch64
           - os: openindiana
+            arch: aarch64
+          - os: hardenedbsd
+            arch: aarch64
+          - os: ghostbsd
             arch: aarch64
 
     uses: ./.github/workflows/testrun.yml
@@ -82,11 +119,15 @@ jobs:
   # NFSv3-only guests (openbsd, netbsd, dragonflybsd) need the nfsd
   # portmapper on port 111; anyvm >= 0.4.9 probes that port and the
   # container has no system rpcbind and runs as root, so it is bindable.
+  # BlissOS is the one guest with no nfs in its sync list.
   testnfs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["freebsd", "netbsd", "openbsd", "solaris", "dragonflybsd", "omnios", "openindiana"]
+        os: ["freebsd", "hardenedbsd", "opnsense", "ghostbsd", "nextbsd",
+             "netbsd", "openbsd", "solaris", "dragonflybsd", "omnios",
+             "openindiana", "tribblix", "ubuntu", "debian", "rocky",
+             "almalinux", "openeuler", "alpine", "hurd"]
         arch: ["aarch64", ""]
         runs: ["ubuntu-24.04"]
         exclude:
@@ -98,6 +139,16 @@ jobs:
             arch: aarch64
           - os: openindiana
             arch: aarch64
+          - os: hardenedbsd
+            arch: aarch64
+          - os: opnsense
+            arch: aarch64
+          - os: ghostbsd
+            arch: aarch64
+          - os: tribblix
+            arch: aarch64
+          - os: hurd
+            arch: aarch64
 
     uses: ./.github/workflows/testrun.yml
     secrets: inherit
@@ -106,14 +157,3 @@ jobs:
       os: ${{ matrix.os }}
       arch: ${{ matrix.arch }}
       sync: nfs
-   
-
-
-
-
-
-
-
-      
-      
-      

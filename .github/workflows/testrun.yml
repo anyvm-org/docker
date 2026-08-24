@@ -37,7 +37,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build image
       run: |
         set -e
@@ -57,7 +57,7 @@ jobs:
         testimage --debug --os "${{ inputs.os }}" \
         --release "${{ inputs.release }}" \
         --arch "${{ inputs.arch }}" \
-        --nc "${{ inputs.nc }}" \
+        --nc "${{ inputs.nic }}" \
         --sync "${{ inputs.sync }}" \
         -- "ls /mnt/host | grep justcheck.txt"
 
