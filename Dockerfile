@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # The QEMU set matches anyvm's own documented Linux dependencies, so every
 # architecture the guests are published for can actually run in here:
-# s390x (ubuntu, openeuler, rocky, almalinux), sparc64 (openbsd, netbsd)
+# s390x (ubuntu, openeuler, rockylinux, almalinux), sparc64 (openbsd, netbsd)
 # and the misc targets incl. loongarch64 (openeuler) used to be missing,
 # which made those --arch values fail with "qemu-system-... not found"
 # rather than anything diagnosable.
@@ -28,7 +28,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
     nfs-kernel-server \
     openssh-server dropbear
 
-ENV ANYVM_VER=0.6.5
+ENV ANYVM_VER=0.7.3
 
 WORKDIR /anyvm.org
 ENV WORKDIR=/anyvm.org
@@ -39,7 +39,7 @@ ENV WORKDIR=/anyvm.org
 # a matched, reproducible pair; the raw path serves whatever the tag points
 # at and is the same channel the *-vm actions were moved off. The asset is
 # published by anyvm's release-asset.yml on every release and is
-# byte-identical to the tagged source (verified by sha256 for v0.6.5).
+# byte-identical to the tagged source (verified by sha256 for v0.7.3).
 ADD https://github.com/anyvm-org/anyvm/releases/download/v${ANYVM_VER}/anyvm.py ${WORKDIR}/anyvm.py
 
 

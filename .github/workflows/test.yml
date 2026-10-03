@@ -39,7 +39,7 @@ jobs:
         os: ["freebsd", "hardenedbsd", "opnsense", "ghostbsd", "midnightbsd",
              "nextbsd", "netbsd", "openbsd", "solaris", "dragonflybsd",
              "omnios", "openindiana", "tribblix", "ubuntu", "debian",
-             "rocky", "almalinux", "openeuler", "alpine", "blissos", "hurd"]
+             "rockylinux", "almalinux", "openeuler", "alpine", "blissos", "hurd"]
         arch: ["aarch64", ""]
         runs: ["ubuntu-24.04"]
         sync: ["scp", "rsync"]
@@ -83,7 +83,7 @@ jobs:
 
   # sshfs, which needs the guest to ship an sshfs binary and a working
   # /dev/fuse. The list is exactly the guests whose VM_SYNC_METHODS names
-  # sshfs -- notably NOT rocky/almalinux (fuse-sshfs is EPEL-only),
+  # sshfs -- notably NOT rockylinux/almalinux (fuse-sshfs is EPEL-only),
   # opnsense (not in its package repo), nextbsd (kernel built NO_MODULES)
   # or hurd (no FUSE at all).
   testsshfs:
@@ -126,7 +126,7 @@ jobs:
       matrix:
         os: ["freebsd", "hardenedbsd", "opnsense", "ghostbsd", "nextbsd",
              "netbsd", "openbsd", "solaris", "dragonflybsd", "omnios",
-             "openindiana", "tribblix", "ubuntu", "debian", "rocky",
+             "openindiana", "tribblix", "ubuntu", "debian", "rockylinux",
              "almalinux", "openeuler", "alpine", "hurd"]
         arch: ["aarch64", ""]
         runs: ["ubuntu-24.04"]
